@@ -16,6 +16,9 @@ struct ContentView: View {
         animation: .default
     ) private var pokedex
     
+    @FetchRequest<Pokemon>(
+        sortDescriptors: []) private var all
+    
     @State private var searchText = ""
     @State private var filterByFavorites = false
     
@@ -40,7 +43,7 @@ struct ContentView: View {
     
     var body: some View {
         
-        if pokedex.isEmpty {
+        if all.isEmpty {
             ContentUnavailableView {
                 Label("No Pokémon", image: .nopokemon)
             } description: {
@@ -91,9 +94,20 @@ struct ContentView: View {
                                     }
                                 }
                             }
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button(pokemon.favorite ? "Remove from Favorites" : "Add to Favorites", systemImage: "star") {
+                                    pokemon.favorite.toggle()
+                                    do {
+                                        try viewContext.save()
+                                    }catch {
+                                        print(error)
+                                    }
+                                }
+                                .tint(pokemon.favorite ? .gray : .yellow)
+                            }
                         }
                     } footer: {
-                        if pokedex.count < 151 {
+                        if all.count < 151 {
                             ContentUnavailableView {
                                 Label("Missing Pokémon", image: .nopokemon)
                             } description: {
