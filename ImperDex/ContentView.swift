@@ -124,6 +124,8 @@ struct ContentView: View {
                 }
                 .navigationDestination(for: Pokemon.self) { pokemon in
                     //design the nav destination here
+                    PokemonDetail()
+                        .environmentObject(pokemon)
                 }
                 .navigationTitle("Pokedex")
                 .toolbar {
