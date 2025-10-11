@@ -23,9 +23,12 @@ struct ContentView: View {
             List {
                 ForEach(pokedex) { pokemon in
                     NavigationLink {
-                        Text(pokemon.name ?? "Unknown")
+                        VStack {
+                            Text(pokemon.name ?? "Unknown")
+                            Text("HP: \(pokemon.hp)")
+                        }
                     } label: {
-                        Text(pokemon.name ?? "Unknown")
+                        Text(pokemon.name?.capitalized ?? "Unknown")
                     }
                 }
             }
@@ -46,8 +49,10 @@ struct ContentView: View {
         Task {
             for id in 1...151 {
                 do {
+                    //temporary fetched pokemon type
                     let fetchedPokemon = try await fetcher.fetchPokemon(id)
                     
+                    //real pokemon being saved
                     let pokemon = Pokemon(context: viewContext)
                     pokemon.id = fetchedPokemon.id
                     pokemon.name = fetchedPokemon.name
