@@ -43,7 +43,7 @@ struct ContentView: View {
     
     var body: some View {
         
-        if all.isEmpty {
+        if all.count < 2 {
             ContentUnavailableView {
                 Label("No Pokémon", image: .nopokemon)
             } description: {
