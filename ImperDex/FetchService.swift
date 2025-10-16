@@ -41,6 +41,8 @@ struct FetchService {
         //step 7: create pokemon container variable
         let pokemon = try decoder.decode(FetchedPokemon.self, from: data)
         
+        print("Pokemon fetched: \(pokemon.id): \(pokemon.name)")
+        
         return pokemon
     }
     
