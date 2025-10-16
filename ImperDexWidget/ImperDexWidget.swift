@@ -58,12 +58,75 @@ struct SimpleEntry: TimelineEntry {
 }
 
 struct ImperDexWidgetEntryView : View {
+    @Environment(\.widgetFamily) var widgetSize
     var entry: Provider.Entry
+    
+    var pokemonImage: some View {
+        entry.sprite
+            .interpolation(.none)
+            .resizable()
+            .scaledToFit()
+            .shadow(color: .black, radius: 6)
+    }
+    
+    var typesView: some View {
+        ForEach(entry.types, id: \.self) { type in
+            Text(type.capitalized)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.black)
+                .padding(.horizontal, 13)
+                .padding(.vertical, 5)
+                .background(Color(type.capitalized))
+                .clipShape(.capsule)
+                .shadow(radius: 3)
+        }
+    }
 
     var body: some View {
-        VStack {
-            entry.sprite
+        
+        switch widgetSize {
+        case .systemMedium:
+            HStack {
+                pokemonImage
+                Spacer()
+                
+                VStack(alignment: .leading) {
+                    Text(entry.name.capitalized)
+                        .font(.title)
+                        .padding(.vertical, 1)
+                    
+                    HStack {
+                        typesView
+                    }
+                }
+                .layoutPriority(1)
+                Spacer()
+            }
+        case .systemLarge:
             
+            ZStack {
+                pokemonImage
+                VStack(alignment: .leading) {
+                    Text(entry.name.capitalized)
+                        .font(.largeTitle)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                    
+                    Spacer()
+                    
+                    HStack {
+                        Spacer()
+                        
+                        typesView
+                    }
+                }
+            }
+            
+            
+            
+        default:
+            pokemonImage
         }
     }
 }
@@ -75,19 +138,34 @@ struct ImperDexWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             if #available(iOS 17.0, *) {
                 ImperDexWidgetEntryView(entry: entry)
-                    .containerBackground(.fill.tertiary, for: .widget)
+                    .foregroundStyle(.black)
+                    .containerBackground(Color(entry.types[0].capitalized), for: .widget)
             } else {
                 ImperDexWidgetEntryView(entry: entry)
                     .padding()
                     .background()
             }
         }
-        .configurationDisplayName("My Widget")
-        .description("This is an example widget.")
+        .configurationDisplayName("Pokemon")
+        .description("See a random Pokemon")
     }
 }
 
 #Preview(as: .systemSmall) {
+    ImperDexWidget()
+} timeline: {
+    SimpleEntry.placeholder
+    SimpleEntry.placeholder2
+}
+
+#Preview(as: .systemMedium) {
+    ImperDexWidget()
+} timeline: {
+    SimpleEntry.placeholder
+    SimpleEntry.placeholder2
+}
+
+#Preview(as: .systemLarge) {
     ImperDexWidget()
 } timeline: {
     SimpleEntry.placeholder
