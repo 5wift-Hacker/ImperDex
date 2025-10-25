@@ -20,21 +20,18 @@ struct ContentView: View {
     
     let fetcher = FetchService()
     
-    private var dynamicPredicate: NSPredicate {
-        var predicates: [NSPredicate] = []
-        
-        //Search predicate
-        if !searchText.isEmpty {
-            //code is 'filter by name, and only include names that contain searchText
-            // [c] means don't worry about case sensitivity
-            predicates.append(NSPredicate(format: "name contains[c] %@", searchText))
+    private var dynamicPredicate: Predicate<Pokemon> {
+        #Predicate<Pokemon> { pokemon in
+            if filterByFavorites && !searchText.isEmpty {
+                pokemon.favorite && pokemon.name.localizedStandardContains(searchText)
+            }else if !searchText.isEmpty {
+                pokemon.name.localizedStandardContains(searchText)
+            }else if filterByFavorites {
+                pokemon.favorite
+            }else {
+                true
+            }
         }
-        //Filter by favorite predicate
-        if filterByFavorites {
-            predicates.append(NSPredicate(format: "favorite == %d", true))
-        }
-        //Combine predicates and return
-        return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
     
     var body: some View {
@@ -55,7 +52,7 @@ struct ContentView: View {
             NavigationStack {
                 List {
                     Section {
-                        ForEach(pokedex) { pokemon in
+                        ForEach((try? pokedex.filter(dynamicPredicate)) ?? pokedex) { pokemon in
                             NavigationLink(value: pokemon) {
                                 //design the nav link here
                                 if pokemon.sprite == nil {
@@ -131,10 +128,13 @@ struct ContentView: View {
                         
                 }
                 .navigationTitle("Pokedex")
+                .animation(.default, value: searchText)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            filterByFavorites.toggle()
+                            withAnimation {
+                                filterByFavorites.toggle()
+                            }
                         } label: {
                             Label("Filter By Favorites", systemImage: filterByFavorites ? "star.fill" : "star")
                         }
