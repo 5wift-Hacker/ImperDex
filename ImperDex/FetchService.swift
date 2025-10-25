@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 struct FetchService {
     //step 1: handle the error with an enum
     

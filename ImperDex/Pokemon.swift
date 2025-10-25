@@ -103,8 +103,9 @@ class Pokemon: Decodable {
         
     }
     
-    @MainActor
+    
     //turning binary data into image, through UI Image
+    @MainActor
     var spriteImage: Image {
         if let data = sprite, let image = UIImage(data: data) {
             Image(uiImage: image)
